@@ -4,7 +4,7 @@ RUN mkdir /src
 
 WORKDIR /src
 ADD app/package.json /src/package.json
-ADD app/www /src/www
+ADD app/src/www /src/www
 ADD app/server.js /src/server.js
 RUN npm install
 

@@ -1,0 +1,33 @@
+.table-header {
+    background-color: #488aff;
+    color: white;
+}
+
+.total-block {
+    background-color: #f4f4f4;
+    border: 0.5px solid lightgray;
+
+}
+
+.generate-invoice-button {
+    margin-top: 5em;
+}
+
+.line-total-columns {
+    background-color: #f4f4f4;
+    align-content: right;
+}
+
+.items-block-right {
+    padding-left: 0;
+}
+
+.items-block {
+    border: 0.5px solid lightgray;
+    padding: 0
+}
+
+.balance{
+    font-weight: bold;
+    font-size: 500
+}

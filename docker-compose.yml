@@ -4,3 +4,6 @@ web:
     - "./app:/src/app"
   ports:
     - "8080:8080"
+  environment:
+      - "VIRTUAL_HOST=invoice.secondcityconstruction.com"
+      - "VIRTUAL_PORT=8080"

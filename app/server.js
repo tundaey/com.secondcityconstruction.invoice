@@ -16,12 +16,12 @@ const path = require('path')
 // }
 
 //app.use(forceSSL())
-app.use(express.static(__dirname + '/app/www'));
+app.use(express.static(__dirname));
 // Start the app by listening on the default
 // Heroku port
 
 app.get('/*', function(req, res) {
-  res.sendFile(path.join(__dirname + '/app/www/index.html'));
+  res.sendFile(path.join(__dirname + 'index.html'));
 });
 
 app.listen(process.env.PORT || 8080);

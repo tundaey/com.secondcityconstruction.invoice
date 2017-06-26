@@ -24,13 +24,13 @@ export class HomePage {
   constructor(public navCtrl: NavController, private formBuilder: FormBuilder) {
 
     this.invoiceForm = this.formBuilder.group({
-      client_fullname: ['Tunde Ganiy', [Validators.required]],
+      client_fullname: ['Rafal Luberda', [Validators.required]],
       date_of_issue: [new Date().toISOString(), [Validators.required]],
       invoice_number: ['01234', [Validators.required]],
-      street: ['23, Hobart Croft', [Validators.required]],
-      city: ['Birmingham', [Validators.required]],
-      state: ['UK', [Validators.required]],
-      zip: ['01234FG', [Validators.required]],
+      street: ['7642 Kedzie', [Validators.required]],
+      city: ['Niles ', [Validators.required]],
+      state: ['IL ', [Validators.required]],
+      zip: ['60714', [Validators.required]],
       balance: [0, [Validators.required]],
       items: this.formBuilder.array([
         this.initializeItems()
@@ -45,7 +45,7 @@ export class HomePage {
   initializeItems(){
     return this.formBuilder.group({
             title: ['', Validators.required],
-            val: [0.00]
+            val: ['']
         });
   }
 
@@ -59,14 +59,31 @@ export class HomePage {
     
   }
 
+  onBlur(value){
+    const total =  this.getTotal(value);
+    console.log('total', total);
+    this.invoiceForm.controls['balance'].setValue(total)
+  }
+
   getTotal(value){
+    console.log('value', value)
     value = parseInt(value);
     const control = <FormArray> this.invoiceForm.controls['items']
     let sumArrays = control.value.map((item)=> {
-      return parseFloat(item.val);
+      console.log('item val', item.val)
+      if(item.val.length == 0){
+        item.val = 0;
+        return parseFloat(item.val);
+      }else{
+        return parseFloat(item.val);
+      }
+      
+      
+      
     })
-
+    console.log('sum arrays', sumArrays)
     const total = sumArrays.reduce(function(acc, val) {
+      console.log('acc and val', acc, val)
       return acc + val;
     }, 0);
     return total 
@@ -92,15 +109,15 @@ export class HomePage {
 
     let doc = new jsPdf();
     doc.setFontSize(9);
-    doc.text(20, street_position_vertical, 'WebVision' );
-    doc.text(20, city_position_vertical, '7642 W Kedzie St');
-    doc.text(20, state_position_vertical, 'Niles IL 60714');
+    doc.text(14, street_position_vertical, 'WebVision' );
+    doc.text(14, city_position_vertical, '7642 W Kedzie St');
+    doc.text(14, state_position_vertical, 'Niles IL 60714');
 
 
-    doc.text(20, company_position_vertical, form.value.client_fullname);
-    doc.text(20, address1_position_vertical, `${form.value.street}`);
-    doc.text(20, address2_position_vertical,`${form.value.city}`);
-    doc.text(20, address2_position_vertical + 5, `${form.value.state} ${form.value.zip}`);
+    doc.text(14, company_position_vertical, form.value.client_fullname);
+    doc.text(14, address1_position_vertical, `${form.value.street}`);
+    doc.text(14, address2_position_vertical,`${form.value.city}`);
+    doc.text(14, address2_position_vertical + 5, `${form.value.state} ${form.value.zip}`);
 
 
     doc.addImage(base64Img, 'JPEG', 140, 20, 40, 20);
@@ -126,32 +143,50 @@ export class HomePage {
     })
     doc.autoTable(columns, rows, {
       startY: items_position_vertical,
-      margin: {left: 20},
+      theme: 'grid',
+      margin: {left: 14},
       showHeader: 'never',
-      style: {
-        lineColor: 20,
+      styles: {
+        lineColor: [181, 185, 191],
+        //lineWidth: 1
       },
       drawCell: function (cell, data) {
          if(data.row.index == 0){
-            doc.setFillColor(244, 244, 244);
+            doc.setFillColor(181, 185, 191);
             doc.setTextColor(0, 0, 0);
-            doc.setFontType('bold')
+            doc.setFontType('bold'); 
           }
 
           if(data.row.index % 2 == 0 &&  !(data.row.index == 0)){
-            doc.setFillColor(255, 255, 255); 
+            doc.setFillColor(255, 255, 255);
+            console.log('data row 2', data.row)
+            //data.row.y = 0
+            
           }
+
+          if(data.row.index % 2 != 0 &&  !(data.row.index == 0)){
+            doc.setFillColor(255, 255, 255);
+            console.log('data row 1', data.row)
+            //data.row.y  = 0
+            //data.row.cells.total.x = 0
+            //data.row.cells.total.y = 0
+          }
+
       },
       columnStyles: {
         name: {
-                halign: 'left'
+                halign: 'left',
+                columnWidth: 140,
+                overflow: 'linebreak'
+          
             },
         total: {
-                halign: 'right'
+                halign: 'right',
+              
             }
         },
       headerStyles:{
-        halign: 'center'
+        halign: 'center',
       }
 
     })
@@ -194,14 +229,17 @@ export class HomePage {
       {title:"Total", dataKey: "name"},
       {title:`${form.value.balance}`, dataKey: "total"},
       ];
-    let rows_for_balance = [{name:"Balance Due(USD)", total: `${form.value.balance}.00`} ];
+    let rows_for_balance = [{name:"Balance Due (USD)", total: `$${form.value.balance}.00`} ];
 
     doc.autoTable(columns_for_balance, rows_for_balance, {
       startY: doc.autoTable.previous.finalY + 2,
-      //tableWidth: 70,
-      // style: {
-      //   lineColor: 200
-      // },
+      theme: 'grid',
+      styles: {
+        //lineColor: [181, 185, 191],
+        lineColor: [244, 247, 252],
+        lineWidth: 0.5
+        
+      },
       
       margin: {left: 80},
       showHeader: 'never',
@@ -215,19 +253,25 @@ export class HomePage {
         },
       drawCell: function (cell, data) {
         if(data.row.index == 0){
-          doc.setFillColor(244, 244, 244);
+          doc.setFillColor(181, 185, 191);
           doc.setTextColor(0, 0, 0);
           doc.setFontType('bold')
         }
       },
     })
 
-    let columns_for_first_balance = ["Balance Due(USD)", `$${form.value.balance}.00`];
+    let columns_for_first_balance = ["Balance Due (USD)", `$${form.value.balance}.00`];
     let rows_for_first_balance = [ ];
 
     doc.autoTable(columns_for_balance , rows_for_balance, {
       startY: company_position_vertical + 7,
+      theme: 'grid',
       margin: {left: 120},
+      styles: {
+        //lineColor: [181, 185, 191],
+        lineColor: [244, 247, 252],
+        lineWidth: 0.5
+      },
       showHeader: 'never',
       columnStyles: {
         name: {
@@ -239,7 +283,7 @@ export class HomePage {
         },
       drawCell: function (cell, data) {
         if(data.row.index == 0){
-          doc.setFillColor(244, 244, 244);
+          doc.setFillColor(181, 185, 191);
           doc.setTextColor(0, 0, 0);
           doc.setFontType('bold')
         }
@@ -255,10 +299,6 @@ export class HomePage {
     
   }
 
-  onBlur(value){
-    const total =  this.getTotal(value);
-    console.log('total', total);
-    this.invoiceForm.controls['balance'].setValue(total)
-  }
+  
 
 }

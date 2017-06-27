@@ -24,13 +24,13 @@ export class HomePage {
   constructor(public navCtrl: NavController, private formBuilder: FormBuilder) {
 
     this.invoiceForm = this.formBuilder.group({
-      client_fullname: ['Rafal Luberda', [Validators.required]],
+      client_fullname: ['', [Validators.required]],
       date_of_issue: [new Date().toISOString(), [Validators.required]],
-      invoice_number: ['01234', [Validators.required]],
-      street: ['7642 Kedzie', [Validators.required]],
-      city: ['Niles ', [Validators.required]],
-      state: ['IL ', [Validators.required]],
-      zip: ['60714', [Validators.required]],
+      invoice_number: ['', [Validators.required]],
+      street: ['', [Validators.required]],
+      city: [' ', [Validators.required]],
+      state: [' ', [Validators.required]],
+      zip: ['', [Validators.required]],
       balance: [0, [Validators.required]],
       items: this.formBuilder.array([
         this.initializeItems()
@@ -109,9 +109,9 @@ export class HomePage {
 
     let doc = new jsPdf();
     doc.setFontSize(9);
-    doc.text(14, street_position_vertical, 'WebVision' );
-    doc.text(14, city_position_vertical, '7642 W Kedzie St');
-    doc.text(14, state_position_vertical, 'Niles IL 60714');
+    doc.text(14, street_position_vertical, 'Second City Roofing & Exteriors, Inc.' );
+    doc.text(14, city_position_vertical, '3006 W. DIVERSEY AVE');
+    doc.text(14, state_position_vertical, 'Chicago, IL 60647');
 
 
     doc.text(14, company_position_vertical, form.value.client_fullname);

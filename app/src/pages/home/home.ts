@@ -73,9 +73,10 @@ export class HomePage {
       console.log('item val', item.val)
       if(item.val.length == 0){
         item.val = 0;
-        return parseFloat(item.val);
+        //parseFloat('0').toFixed(2)
+        return parseFloat(item.val)//.toFixed(2);
       }else{
-        return parseFloat(item.val);
+        return parseFloat(item.val)//.toFixed(2);
       }
       
       
@@ -83,10 +84,9 @@ export class HomePage {
     })
     console.log('sum arrays', sumArrays)
     const total = sumArrays.reduce(function(acc, val) {
-      console.log('acc and val', acc, val)
       return acc + val;
     }, 0);
-    return total 
+    return total.toFixed(2) 
     
   }
 
@@ -129,7 +129,7 @@ export class HomePage {
     doc.text(122, company_position_vertical + 5, 'Invoice Date');
     doc.text(175, company_position_vertical + 5, `${now}`);
 
-    
+    let balance = (form.value.balance === 0) ? parseFloat('0').toFixed(2) : form.value.balance
     let columns = [
       {title:"Time Entry Notes", dataKey: "name"},
       {title:"Line Total", dataKey: "total"},
@@ -137,7 +137,8 @@ export class HomePage {
     let rows = [{name:"Time Entry Notes", total: "Line Total"}]
     form.value.items.forEach((obj)=>{
       obj['name'] = obj.title;
-      obj['total'] = `${obj.val}.00`;
+      //obj['total'] = parseFloat(obj.val).toFixed(2);
+      obj['total'] = (obj.val.length == 0) ? parseFloat('0').toFixed(2) : parseFloat(obj.val).toFixed(2);
       rows.push(obj)
       //return obj;
     })
@@ -147,6 +148,7 @@ export class HomePage {
       margin: {left: 14},
       showHeader: 'never',
       styles: {
+        textColor: 20,
         lineColor: [181, 185, 191],
         //lineWidth: 1
       },
@@ -167,9 +169,7 @@ export class HomePage {
           if(data.row.index % 2 != 0 &&  !(data.row.index == 0)){
             doc.setFillColor(255, 255, 255);
             console.log('data row 1', data.row)
-            //data.row.y  = 0
-            //data.row.cells.total.x = 0
-            //data.row.cells.total.y = 0
+          
           }
 
       },
@@ -196,10 +196,10 @@ export class HomePage {
     //let columns_for_total = ["Total", `${form.value.balance}`];
     let columns_for_total = [
       {title:"Total", dataKey: "name"},
-      {title:`${form.value.balance}.00`, dataKey: "total"},
+      {title:`${form.value.balance}`, dataKey: "total"},
     ];
     let rows_for_total = [
-      {name:"Total", total: `${form.value.balance}.00`},
+      {name:"Total", total: `${form.value.balance}`},
       {name: "Amount Paid", total: "0.00"}
     ];
 
@@ -212,6 +212,10 @@ export class HomePage {
             doc.setFillColor(255, 255, 2555);
             doc.setTextColor(0, 0, 0);
             doc.setFontType('bold')
+          }
+
+          if(data.row.index == 2){
+            doc.setTextColor(20);
           }
       },
       columnStyles: {
@@ -227,9 +231,11 @@ export class HomePage {
 
     let columns_for_balance = [
       {title:"Total", dataKey: "name"},
-      {title:`${form.value.balance}`, dataKey: "total"},
+      {title:`${balance}`, dataKey: "total"},
       ];
-    let rows_for_balance = [{name:"Balance Due (USD)", total: `$${form.value.balance}.00`} ];
+      
+    
+    let rows_for_balance = [{name:"Balance Due (USD)", total: `$${balance}`} ];
 
     doc.autoTable(columns_for_balance, rows_for_balance, {
       startY: doc.autoTable.previous.finalY + 2,
@@ -260,7 +266,7 @@ export class HomePage {
       },
     })
 
-    let columns_for_first_balance = ["Balance Due (USD)", `$${form.value.balance}.00`];
+    let columns_for_first_balance = ["Balance Due (USD)", `$${balance}`];
     let rows_for_first_balance = [ ];
 
     doc.autoTable(columns_for_balance , rows_for_balance, {
@@ -289,7 +295,6 @@ export class HomePage {
         }
       },
     })
-
 
     doc.save(form.value.invoice_number);    
 

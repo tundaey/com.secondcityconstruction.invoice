@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
+import { LoadingController } from 'ionic-angular';
+
 
 import { FormGroup, FormArray, Validators, FormBuilder } from '@angular/forms';
 
@@ -21,7 +23,7 @@ export class HomePage {
   invoiceForm: FormGroup;
   balance: number;
   //image = require('../../assets/second-logo.png')
-  constructor(public navCtrl: NavController, private formBuilder: FormBuilder) {
+  constructor(public navCtrl: NavController, private formBuilder: FormBuilder, public loadingCtrl: LoadingController) {
 
     this.invoiceForm = this.formBuilder.group({
       client_fullname: ['', [Validators.required]],
@@ -88,6 +90,29 @@ export class HomePage {
     }, 0);
     return total.toFixed(2) 
     
+  }
+
+  presentLoading() {
+    let loader = this.loadingCtrl.create({
+      content: 'Please wait...',
+      //duration: 3000,
+      dismissOnPageChange: true
+    })//.present();
+
+    return loader;
+
+  }
+
+  closeLoading(){
+    
+  }
+
+  submitForm(form){
+    const loader = this.presentLoading();
+    loader.present().then(()=> {
+      this.generateInvoice(form);
+      loader.dismiss()
+    })
   }
 
   generateInvoice(form){

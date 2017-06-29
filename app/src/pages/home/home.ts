@@ -24,23 +24,23 @@ export class HomePage {
   balance: number;
   //image = require('../../assets/second-logo.png')
   constructor(public navCtrl: NavController, private formBuilder: FormBuilder, public loadingCtrl: LoadingController) {
-
+    let balance: number = 0;
     this.invoiceForm = this.formBuilder.group({
       client_fullname: ['', [Validators.required]],
-      date_of_issue: [new Date().toISOString(), [Validators.required]],
+      date_of_issue: ['', [Validators.required]],
       invoice_number: ['', [Validators.required]],
       street: ['', [Validators.required]],
-      city: [' ', [Validators.required]],
-      state: [' ', [Validators.required]],
       zip: ['', [Validators.required]],
-      balance: [0, [Validators.required]],
+      zip2: ['', [Validators.required]],//city
+      zip3: ['', [Validators.required]],//state
+      balance: [balance.toFixed(2), [Validators.required]],
       items: this.formBuilder.array([
         this.initializeItems()
       ]),
     })
 
     const invoice_number = this.generateInvoiceNumber()
-    this.invoiceForm.controls['invoice_number'].setValue(invoice_number)
+    //this.invoiceForm.controls['invoice_number'].setValue(invoice_number)
     
   }
 
@@ -141,8 +141,8 @@ export class HomePage {
 
     doc.text(14, company_position_vertical, form.value.client_fullname);
     doc.text(14, address1_position_vertical, `${form.value.street}`);
-    doc.text(14, address2_position_vertical,`${form.value.city}`);
-    doc.text(14, address2_position_vertical + 5, `${form.value.state} ${form.value.zip}`);
+    doc.text(14, address2_position_vertical,`${form.value.zip2}, ${form.value.zip3}  ${form.value.zip}`);
+    //doc.text(14, address2_position_vertical + 5, `${form.value.zip3} ${form.value.zip}`);
 
 
     doc.addImage(base64Img, 'JPEG', 140, 20, 40, 20);
@@ -150,9 +150,10 @@ export class HomePage {
     let now = moment(form.value.date_of_issue).format('MMMM DD, YYYY');
 
     doc.text(122, company_position_vertical, 'Invoice # ');
-    doc.text(186, company_position_vertical, `${form.value.invoice_number}`);
+    doc.text(`${form.value.invoice_number}`, 195, company_position_vertical, 'right');
     doc.text(122, company_position_vertical + 5, 'Invoice Date');
-    doc.text(175, company_position_vertical + 5, `${now}`);
+    //doc.text(170, company_position_vertical + 5, `${now}`);
+    doc.text(`${now}`, 195, company_position_vertical + 5, 'right');
 
     let balance = (form.value.balance === 0) ? parseFloat('0').toFixed(2) : form.value.balance
     let columns = [
@@ -323,8 +324,8 @@ export class HomePage {
 
     doc.save(form.value.invoice_number);    
 
-    const invoice_number = this.generateInvoiceNumber()
-    this.invoiceForm.controls['invoice_number'].setValue(invoice_number)
+    //const invoice_number = this.generateInvoiceNumber()
+    //this.invoiceForm.controls['invoice_number'].setValue(invoice_number)
         
     
   }
